@@ -1,0 +1,14 @@
+language: go
+
+go:
+  - 1.x
+
+jobs:
+  include:
+    - name: 'Test the README example'
+      script:
+        - mkdir tmp && sed -n '/^```Go$/,/^```$/ p' README.md | sed '1d;$d' > tmp/test.go
+        - go run tmp/test.go
+    - name: 'Go test'
+      script:
+        - go test -v ./...

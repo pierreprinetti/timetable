@@ -1,4 +1,5 @@
 # timetable
+[![Build Status](https://travis-ci.org/pierreprinetti/timetable.svg?branch=master)](https://travis-ci.org/pierreprinetti/timetable)
 
 A Go type for recurring events, like opening hours.
 
