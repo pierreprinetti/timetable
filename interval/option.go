@@ -34,6 +34,7 @@ func EndDate(t time.Time) option {
 }
 
 // Clock can be passed as an option to New to restrict the interval to specific hours.
+// Location data will be preserved.
 //
 // Example:
 //

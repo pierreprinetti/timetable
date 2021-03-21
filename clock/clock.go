@@ -4,22 +4,15 @@ import (
 	"time"
 )
 
+const layout = "15:04 MST"
+
+// Clock holds information for a specific hour of the day, in a specific
+// timezone.
 type Clock struct {
 	hour     int
 	minute   int
 	location *time.Location
 }
-
-type clockError string
-
-func (cErr clockError) Error() string {
-	return string(cErr)
-}
-
-const (
-	ErrHourOutOfBounds   clockError = "The hour must be between 0 and 23"
-	ErrMinuteOutOfBounds clockError = "The minute must be between 0 and 59"
-)
 
 func (c Clock) Hour() int {
 	return c.hour
@@ -31,7 +24,7 @@ func (c Clock) Minute() int {
 
 // String implements fmt.Stringer
 func (c Clock) String() string {
-	return time.Date(1, 1, 1, c.hour, c.minute, 0, 0, c.location).Format("15:04")
+	return time.Date(1, 1, 1, c.hour, c.minute, 0, 0, c.location).Format(layout)
 }
 
 // MarshalJSON implements json.Marshaler
@@ -39,20 +32,17 @@ func (c Clock) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + c.String() + `"`), nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler
-func (c *Clock) UnmarshalJSON(src []byte) error {
-	t, err := time.Parse("15:04", string(src))
-	if err != nil {
-		return err
+// UnmarshalJSON implements json.Unmarshaler. The time is expected to be a
+// quoted string in "15:04 MST" format.
+func (c *Clock) UnmarshalJSON(data []byte) error {
+	// Ignore null, like in the main JSON package.
+	if string(data) == "null" {
+		return nil
 	}
 
+	t, err := time.Parse(`"`+layout+`"`, string(data))
 	*c = FromTime(t)
-
-	return nil
-}
-
-func (c Clock) IsZero() bool {
-	return c.Hour() == 0 && c.Minute() == 0
+	return err
 }
 
 func (c Clock) In(location *time.Location) Clock {
